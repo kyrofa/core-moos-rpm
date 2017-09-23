@@ -1,0 +1,15 @@
+Install versioned libs
+--- a/Core/libMOOS/CMakeLists.txt
++++ b/Core/libMOOS/CMakeLists.txt
+@@ -237,7 +237,10 @@
+ target_link_libraries(${LIBNAME} ${${LIBNAME}_DEPEND_LIBRARIES})
+
+
+-
++# Version shared libs appropriately
++set_target_properties(${LIBNAME} PROPERTIES
++	VERSION ${PACKAGE_VERSION}
++	SOVERSION ${PACKAGE_VERSION_MAJOR})
+
+ #######################################
+ # install headers

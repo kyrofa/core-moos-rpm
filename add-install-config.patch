@@ -1,0 +1,78 @@
+Provide cmake config file for installed targets
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -200,6 +200,40 @@
+ set(VERSION_FILE "${PROJECT_BINARY_DIR}/${PROJECTNAME}ConfigVersion.cmake")
+ configure_file( "cmake/ProjectConfigVersion.cmake.in" ${VERSION_FILE} @ONLY )
+
++#########################
++# Install target
++#########################
+
++# Provide a cmake config script for the install directory
++set(PROJECT_CONFIG_PATH "lib/cmake/MOOS")
++install(
++    EXPORT ${PROJECT_EXPORT_LIBS}
++    FILE Use${PROJECTNAME}.cmake
++    DESTINATION ${PROJECT_CONFIG_PATH}
++)
+
++# Headers are all combined into one common 'include' dir when MOOS is installed.
++# This path needs to be relative to the package config file itself.
++set(MOOS_INCLUDE_DIRS "\${CMAKE_CURRENT_LIST_DIR}/../../../include")
++set(CONFIG_FILE "${PROJECT_BINARY_DIR}/MOOSInstallConfig.cmake")
++configure_file("cmake/ProjectConfig.cmake.in" ${CONFIG_FILE} @ONLY)
++# Append libary specific lines to the generated config script
++foreach(EXPORT_LIB ${PROJECT_EXPORT_LIBS})
++  file(APPEND ${CONFIG_FILE} "\n# Export variables for ${EXPORT_LIB} Library\n")
++  file(APPEND ${CONFIG_FILE} "set(${EXPORT_LIB}_LIBRARIES \"${${EXPORT_LIB}_LIBRARIES}\")\n")
++  file(APPEND ${CONFIG_FILE} "set(${EXPORT_LIB}_INCLUDE_DIRS \"${${EXPORT_LIB}_INCLUDE_DIRS}\")\n")
++  file(APPEND ${CONFIG_FILE} "set(${EXPORT_LIB}_DEPEND_LIBRARIES \"${${EXPORT_LIB}_DEPEND_LIBRARIES}\")\n")
++endforeach()
+
++foreach(DEFINE ${PROJECT_EXPORT_DEFINES})
++  file(APPEND ${CONFIG_FILE} "ADD_DEFINITIONS(-D${DEFINE})\n")
++  file(APPEND ${CONFIG_FILE}  "message(STATUS \"adding -D${DEFINE} as required by MOOS\")" )
++endforeach()
++install(
++    FILES "${CONFIG_FILE}"
++    RENAME ${PROJECTNAME}Config.cmake
++    DESTINATION "${PROJECT_CONFIG_PATH}"
++)
++
++# Save a version file in the project's install directory
++install(FILES ${VERSION_FILE} DESTINATION "${PROJECT_CONFIG_PATH}")
+--- a/Core/libMOOS/CMakeLists.txt
++++ b/Core/libMOOS/CMakeLists.txt
+@@ -241,11 +241,12 @@
+
+ #######################################
+ # install headers
+-install(DIRECTORY ${INCLUDE_ROOTS} DESTINATION ${CMAKE_INSTALL_PREFIX} FILES_MATCHING PATTERN "*.h")
++install(DIRECTORY ${INCLUDE_ROOTS} DESTINATION ${CMAKE_INSTALL_PREFIX} FILES_MATCHING PATTERN "*.h" PATTERN "*.hxx")
+
+
+ # install libraries
+ INSTALL(TARGETS ${LIBNAME}
++  EXPORT MOOS
+   LIBRARY DESTINATION lib
+   ARCHIVE DESTINATION lib
+ )
+--- a/cmake/ProjectConfig.cmake.in
++++ b/cmake/ProjectConfig.cmake.in
+@@ -2,7 +2,7 @@
+
+ # Pick up the auto-generated file which knows how to add the library targets
+ # This will mean that we don't have to supply full paths for the libraries
+-set(exports_file "@CMAKE_CURRENT_BINARY_DIR@/Use@PROJECTNAME@.cmake")
++set(exports_file "${CMAKE_CURRENT_LIST_DIR}/Use@PROJECTNAME@.cmake")
+
+ if( NOT MOOS_FOUND)
+     #only pull in if not already done!
+@@ -18,4 +18,4 @@
+ message(STATUS "MOOS_FOUND=${MOOS_FOUND} time to dance")
+
+
+-# Project specific variables are dynamically inserted here
+\ No newline at end of file
++# Project specific variables are dynamically inserted here

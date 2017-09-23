@@ -1,0 +1,45 @@
+Use GNUInstallDirs
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -27,6 +27,8 @@
+
+ project(${PROJECTNAME})
+
++include(GNUInstallDirs)
++
+
+
+ if(NOT DEFINED CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+@@ -205,7 +207,7 @@
+ #########################
+
+ # Provide a cmake config script for the install directory
+-set(PROJECT_CONFIG_PATH "lib/cmake/MOOS")
++set(PROJECT_CONFIG_PATH "${CMAKE_INSTALL_LIBDIR}/cmake/MOOS")
+ install(
+     EXPORT ${PROJECT_EXPORT_LIBS}
+     FILE Use${PROJECTNAME}.cmake
+--- a/Core/MOOSDB/CMakeLists.txt
++++ b/Core/MOOSDB/CMakeLists.txt
+@@ -32,8 +32,8 @@
+
+ INSTALL(TARGETS ${EXECNAME}
+   RUNTIME DESTINATION bin
+-  LIBRARY DESTINATION lib
+-  ARCHIVE DESTINATION lib
++  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
++  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+ )
+
+ add_subdirectory(testing)
+--- a/Core/libMOOS/CMakeLists.txt
++++ b/Core/libMOOS/CMakeLists.txt
+@@ -250,8 +250,8 @@
+ # install libraries
+ INSTALL(TARGETS ${LIBNAME}
+   EXPORT MOOS
+-  LIBRARY DESTINATION lib
+-  ARCHIVE DESTINATION lib
++  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
++  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+ )
