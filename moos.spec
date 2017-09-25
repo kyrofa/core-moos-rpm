@@ -64,6 +64,7 @@ Libraries for running %{name} applications.
 %{_libdir}/*.so
 
 %files libs
+%license Core/GPLCore.txt
 %{_libdir}/*.so.*
 
 %post libs -p /sbin/ldconfig
