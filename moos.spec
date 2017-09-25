@@ -5,7 +5,7 @@ Summary:  Mission Oriented Operating Suite
 
 License:  GPLv2+
 URL:      http://www.robots.ox.ac.uk/~mobile/MOOS/wiki/pmwiki.php/Main/HomePage
-Source0:  https://github.com/themoos/core-moos/archive/%{version}-release.tar.gz
+Source0:  https://github.com/themoos/core-moos/archive/%{version}-release/core-moos-%{version}-release.tar.gz
 
 Patch0:   add-install-config.patch
 Patch1:   add-shared-library.patch
